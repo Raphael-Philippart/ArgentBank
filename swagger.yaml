@@ -1,0 +1,277 @@
+openapi: 3.0.1
+info:
+  title: Transactions API
+  description: API pour gérer les transactions des utilisateurs
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+paths:
+  /transactions:
+    get:
+      summary: Visualiser toutes les transactions pour le mois en cours, groupées par compte
+      description: Retourne toutes les transactions de l'utilisateur pour le mois en cours, groupées par compte
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: month
+          in: query
+          required: true
+          description: Mois pour lequel récupérer les transactions (format MM)
+          schema:
+            type: string
+            example: '07'
+        - name: year
+          in: query
+          required: true
+          description: Année pour laquelle récupérer les transactions (format YYYY)
+          schema:
+            type: string
+            example: '2024'
+      responses:
+        '200':
+          description: Liste des transactions récupérées avec succès, groupées par compte
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Transaction'
+              examples:
+                example1:
+                  summary: Transactions groupées par compte
+                  value:
+                    account1:
+                      - id: '1'
+                        accountId: 'account1'
+                        date: '2024-07-15T14:30:00Z'
+                        amount: 100.00
+                        description: 'Paiement de facture'
+                    account2:
+                      - id: '2'
+                        accountId: 'account2'
+                        date: '2024-07-16T10:00:00Z'
+                        amount: 50.50
+                        description: 'Achat supermarché'
+        '401':
+          description: Non autorisé
+        '500':
+          description: Erreur interne du serveur
+  /transactions/{id}:
+    get:
+      summary: Visualiser les détails d'une transaction
+      description: Retourne les détails d'une transaction spécifique
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la transaction
+          schema:
+            type: string
+            example: '1'
+      responses:
+        '200':
+          description: Détails de la transaction récupérés avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+              examples:
+                example1:
+                  summary: Détails de la transaction
+                  value:
+                    id: '1'
+                    accountId: 'account1'
+                    date: '2024-07-15T14:30:00Z'
+                    amount: 100.00
+                    description: 'Paiement de facture'
+        '401':
+          description: Non autorisé
+        '404':
+          description: Transaction non trouvée
+        '500':
+          description: Erreur interne du serveur
+    post:
+      summary: Ajouter des informations sur une transaction
+      description: Ajoute des informations sur une transaction spécifique
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la transaction
+          schema:
+            type: string
+            example: '1'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionInfo'
+            examples:
+              example1:
+                summary: Informations sur la transaction
+                value:
+                  notes: 'Réception de paiement'
+                  category: 'Revenu'
+      responses:
+        '201':
+          description: Informations ajoutées avec succès
+        '400':
+          description: Mauvaise requête
+        '401':
+          description: Non autorisé
+        '500':
+          description: Erreur interne du serveur
+    put:
+      summary: Modifier les informations d'une transaction
+      description: Modifie les informations d'une transaction spécifique
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la transaction
+          schema:
+            type: string
+            example: '1'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionInfo'
+            examples:
+              example1:
+                summary: Modification des informations sur la transaction
+                value:
+                  notes: 'Réception de paiement ajusté'
+                  category: 'Revenu'
+      responses:
+        '200':
+          description: Informations modifiées avec succès
+        '400':
+          description: Mauvaise requête
+        '401':
+          description: Non autorisé
+        '404':
+          description: Transaction non trouvée
+        '500':
+          description: Erreur interne du serveur
+    delete:
+      summary: Supprimer les informations d'une transaction
+      description: Supprime les informations d'une transaction spécifique
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la transaction
+          schema:
+            type: string
+            example: '1'
+      responses:
+        '204':
+          description: Informations supprimées avec succès
+        '401':
+          description: Non autorisé
+        '404':
+          description: Transaction non trouvée
+        '500':
+          description: Erreur interne du serveur
+  /categories:
+    get:
+      summary: Récupérer la liste des catégories de transactions
+      description: Retourne la liste des catégories disponibles pour les transactions
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des catégories récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+              examples:
+                example1:
+                  summary: Liste des catégories
+                  value:
+                    - id: '1'
+                      name: 'Revenu'
+                    - id: '2'
+                      name: 'Dépense'
+        '401':
+          description: Non autorisé
+        '500':
+          description: Erreur interne du serveur
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID de la transaction
+        accountId:
+          type: string
+          description: ID du compte associé à la transaction
+        date:
+          type: string
+          format: date-time
+          description: Date et heure de la transaction
+        amount:
+          type: number
+          description: Montant de la transaction
+        description:
+          type: string
+          description: Description de la transaction
+      required:
+        - accountId
+        - date
+        - amount
+        - description
+      example:
+        id: '1'
+        accountId: 'account1'
+        date: '2024-07-15T14:30:00Z'
+        amount: 100.00
+        description: 'Paiement de facture'
+    TransactionInfo:
+      type: object
+      properties:
+        notes:
+          type: string
+          description: Notes supplémentaires sur la transaction
+        category:
+          type: string
+          description: Catégorie de la transaction
+      example:
+        notes: 'Réception de paiement'
+        category: 'Revenu'
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID de la catégorie
+        name:
+          type: string
+          description: Nom de la catégorie
+      example:
+        id: '1'
+        name: 'Revenu'
