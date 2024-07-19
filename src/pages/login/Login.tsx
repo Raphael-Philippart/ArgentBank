@@ -7,9 +7,9 @@ import {useSelector} from "react-redux";
 import {selectAuthToken, selectUserError, selectUserLoading} from "../../store/selectors/authSelectors";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faUserCircle} from '@fortawesome/free-solid-svg-icons';
-import styles from './SignIn.module.scss';
+import styles from './Login.module.scss';
 
-const SignIn: React.FC = () => {
+const Login: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,7 +27,7 @@ const SignIn: React.FC = () => {
 
   useEffect(() => {
     if (token && !error && error !== 'invalid token') {
-      navigate('/user');
+      navigate('/profile');
     }
   }, [token, navigate, error]);
 
@@ -69,4 +69,4 @@ const SignIn: React.FC = () => {
   </div>
 };
 
-export default SignIn;
+export default Login;

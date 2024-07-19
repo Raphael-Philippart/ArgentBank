@@ -7,7 +7,7 @@ import {selectAuthToken, selectUserError, selectUserProfile} from "../../store/s
 import styles from "./User.module.scss";
 import EditButton from "../../components/uix/profil/EditButton";
 
-const User: React.FC = () => {
+const Profil: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const userProfile  = useSelector(selectUserProfile);
@@ -16,7 +16,7 @@ const User: React.FC = () => {
 
   useEffect(() => {
     if (!token || error === 'invalid token') {
-      navigate('/sign-in');
+      navigate('/login');
     }
   }, [token, navigate, error]);
 
@@ -34,4 +34,4 @@ const User: React.FC = () => {
   </>
 };
 
-export default User;
+export default Profil;

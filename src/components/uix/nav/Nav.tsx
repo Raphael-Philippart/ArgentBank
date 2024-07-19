@@ -17,14 +17,14 @@ const Nav = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/sign-in');
+    navigate('/');
   };
 
   return <nav className={styles.mainNav}>
     <Logo/>
     <div className={styles.mainNavContainer}>
       {userProfile && <div>
-        <a className={styles.mainNavItem} href="/user">
+        <a className={styles.mainNavItem} href="/profile">
           <FontAwesomeIcon icon={faUserCircle} size="1x"/>
           {userProfile.lastName}
         </a>
@@ -34,7 +34,7 @@ const Nav = () => {
           <FontAwesomeIcon icon={faSignOutAlt} size="1x"/>
           Sign Out
         </button> :
-        <a className={styles.mainNavItem} href="/sign-in">
+        <a className={styles.mainNavItem} href="/login">
           <FontAwesomeIcon icon={faUserCircle} size="1x"/>
           Sign In
         </a>}
