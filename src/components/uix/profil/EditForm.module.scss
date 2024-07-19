@@ -1,0 +1,35 @@
+.editFormContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 20px;
+
+  .editFormInput {
+    font-size: 16px;
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+
+  .fullWidth {
+    grid-column: span 1;
+  }
+
+  .saveButton, .cancelButton {
+    background-color: #00bc77;
+    color: white;
+    width: 100px;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .saveButton {
+    justify-self: right;
+  }
+
+  .cancelButton {
+    justify-self: left;
+  }
+}
