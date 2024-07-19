@@ -13,12 +13,10 @@ const selectAuthToken = createSelector(
   (auth) => auth.token
 );
 
-
 const selectUserLoading = createSelector(
   [selectAuthState],
   (auth) => auth.loading
 );
-
 
 const selectUserError = createSelector(
   [selectAuthState],

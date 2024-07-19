@@ -28,7 +28,7 @@ const User: React.FC = () => {
 
   return <>
     {userProfile && <div className={styles.userPage}>
-      <h1>Welcome back <br/> {userProfile?.firstName} {userProfile?.lastName}</h1>
+      <h1>Welcome back <br/> {userProfile?.firstName} {userProfile?.lastName}!</h1>
       <EditButton />
     </div>}
   </>

@@ -1,4 +1,3 @@
-// store/middleware/authMiddleware.test.ts
 import {Dispatch, MiddlewareAPI} from '@reduxjs/toolkit';
 import {FetchAction, RootState} from '../types';
 import {authMiddleware} from './authMiddleware';
@@ -62,7 +61,7 @@ describe('authMiddleware', () => {
   });
 
   it('should pass through actions that are not fetch actions', () => {
-    const action = { type: 'test' };
+    const action = {type: 'test'};
 
     invoke(action);
 

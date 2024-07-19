@@ -97,7 +97,6 @@ export const updateUserProfile = createAsyncThunk<
       return thunkAPI.rejectWithValue('Failed to update user profile');
     }
 
-    const data = await response.json();
-    return data;
+    return await response.json();
   }
 );
