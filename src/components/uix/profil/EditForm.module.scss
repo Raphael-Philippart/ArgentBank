@@ -33,3 +33,12 @@
     justify-self: left;
   }
 }
+
+.saveButton.disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+.error {
+  color: red;
+  margin: 0;
+}

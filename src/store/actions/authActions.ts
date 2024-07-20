@@ -1,6 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
-import {loginResponseSchema, loginSchema} from '../../schemas/authSchemas';
-import {LoginData, UserProfile} from "../../types/types";
+import {loginResponseSchema, loginSchema, profileResponseSchema, userProfileSchema} from '../../schemas/authSchemas';
+import {LoginType, UserProfile} from "../../types/types";
 import {RootState} from '../index';
 
 if (!process.env.REACT_APP_API_URL) {
@@ -9,38 +9,79 @@ if (!process.env.REACT_APP_API_URL) {
 
 const path = process.env.REACT_APP_API_URL;
 
+/**
+ * Extracts the error message from the API response.
+ *
+ * @param response - The response object from the fetch request.
+ * @returns The error message as a string.
+ */
+const extractErrorMessage = async (response: Response): Promise<string> => {
+  try {
+    const data = await response.json();
+    return (data as { message: string }).message || 'An error occurred';
+  } catch {
+    return 'An error occurred';
+  }
+};
+
+/**
+ * Thunk for logging in a user.
+ *
+ * @param LoginType - The login data to be sent to the API.
+ * @param thunkAPI - The thunk API object provided by createAsyncThunk.
+ * @returns The token received from the API if the login is successful.
+ */
 export const login = createAsyncThunk<
   { token: string },
-  LoginData,
+  LoginType,
   { state: RootState; rejectValue: string }
->('auth/login', async (loginData: LoginData, thunkAPI) => {
-  try {
-    loginSchema.parse(loginData);
+>(
+  'auth/login',
+  async (loginData: LoginType, thunkAPI) => {
+    try {
+      // Validate login data
+      loginSchema.parse(loginData);
 
-    const response = await fetch(`${path}/user/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(loginData),
-    });
+      // Send login request
+      const response = await fetch(`${path}/user/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+      });
 
-    const data = await response.json();
+      if (!response.ok) {
+        // Extract and return the error message
+        const errorMessage = await extractErrorMessage(response);
+        return thunkAPI.rejectWithValue(errorMessage);
+      }
 
-    if (!response.ok) {
-      const errorMessage = (data as { message: string }).message;
-      return thunkAPI.rejectWithValue(errorMessage);
+      // Extract data from the response
+      const data = await response.json();
+
+      // Validate response data
+      const parsedData = loginResponseSchema.parse(data);
+      const { token } = parsedData.body;
+
+      return { token };
+    } catch (error) {
+      if (error instanceof Error) {
+        return thunkAPI.rejectWithValue(error.message);
+      } else {
+        return thunkAPI.rejectWithValue('Unknown error');
+      }
     }
-
-    const parsedData = loginResponseSchema.parse(data);
-    const { token } = parsedData.body;
-
-    return { token };
-  } catch (error: any) {
-    return thunkAPI.rejectWithValue('Une erreur inattendue est apparue');
   }
-});
+);
 
+/**
+ * Thunk for fetching the user profile.
+ *
+ * @param _ - No parameters are needed for this thunk.
+ * @param thunkAPI - The thunk API object provided by createAsyncThunk.
+ * @returns The user profile data if the fetch is successful.
+ */
 export const fetchUserProfile = createAsyncThunk<
   any,
   void,
@@ -53,25 +94,44 @@ export const fetchUserProfile = createAsyncThunk<
       return thunkAPI.rejectWithValue("Vous devez être authentifié.");
     }
 
-    const response = await fetch(`${path}/user/profile`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-    });
+    try {
+      const response = await fetch(`${path}/user/profile`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
 
-    const data = await response.json();
+      if (!response.ok) {
+        const errorMessage = await extractErrorMessage(response);
+        return thunkAPI.rejectWithValue(errorMessage);
+      }
 
-    if (!response.ok) {
-      const errorMessage = (data as { message: string }).message;
-      return thunkAPI.rejectWithValue(errorMessage);
+      // Extract data from the response
+      const data = await response.json();
+
+      // Validate response data
+      const parsedData = profileResponseSchema.parse(data);
+
+      return parsedData.body;
+    } catch (error) {
+      if (error instanceof Error) {
+        return thunkAPI.rejectWithValue(error.message);
+      } else {
+        return thunkAPI.rejectWithValue('Erreur inconnue');
+      }
     }
-
-    return data.body;
   }
 );
 
+/**
+ * Thunk for updating the user profile.
+ *
+ * @param userData - The user profile data to be sent to the API.
+ * @param thunkAPI - The thunk API object provided by createAsyncThunk.
+ * @returns The updated user profile data if the update is successful.
+ */
 export const updateUserProfile = createAsyncThunk<
   any,
   UserProfile,
@@ -84,19 +144,34 @@ export const updateUserProfile = createAsyncThunk<
       return thunkAPI.rejectWithValue('No token found');
     }
 
-    const response = await fetch(`${path}/user/profile`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(userData),
-    });
+    try {
+      // Validate login data
+      userProfileSchema.parse(userData);
 
-    if (!response.ok) {
-      return thunkAPI.rejectWithValue('Failed to update user profile');
+      const response = await fetch(`${path}/user/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        // Extract and return the error message
+        const errorMessage = await extractErrorMessage(response);
+        return thunkAPI.rejectWithValue(errorMessage);
+      }
+
+      // Extract data from the response
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      if (error instanceof Error) {
+        return thunkAPI.rejectWithValue(error.message);
+      } else {
+        return thunkAPI.rejectWithValue('Unknown error');
+      }
     }
-
-    return await response.json();
   }
 );

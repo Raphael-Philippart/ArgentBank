@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {LoginData} from "../../types/types";
+import {LoginType} from "../../types/types";
 import {login} from "../../store/actions/authActions";
 import {useAppDispatch} from "../../store/hooks";
 import {useNavigate} from 'react-router-dom';
@@ -21,7 +21,7 @@ const Login: React.FC = () => {
   const handleSignIn = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    const loginData: LoginData = {email, password};
+    const loginData: LoginType = {email, password};
     dispatch(login(loginData));
   };
 
