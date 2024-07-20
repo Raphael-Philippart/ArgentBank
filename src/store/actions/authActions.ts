@@ -164,8 +164,7 @@ export const updateUserProfile = createAsyncThunk<
       }
 
       // Extract data from the response
-      const data = await response.json();
-      return data;
+      return await response.json();
     } catch (error) {
       if (error instanceof Error) {
         return thunkAPI.rejectWithValue(error.message);
