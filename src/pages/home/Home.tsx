@@ -1,14 +1,13 @@
 import React, {useEffect} from 'react';
-import {useSelector} from "react-redux";
 import HomeHeader from "../../components/uix/home/header/HomeHeader";
 import Features from "../../components/uix/home/features/Features";
 import {selectUserProfile} from "../../store/selectors/authSelectors";
 import {fetchUserProfile} from "../../store/actions/authActions";
-import {useAppDispatch} from "../../store/hooks";
+import {useAppDispatch, useAppSelector} from "../../store/hooks";
 
 const Home = () => {
   const dispatch = useAppDispatch();
-  const userProfile = useSelector(selectUserProfile);
+  const userProfile = useAppSelector(selectUserProfile);
 
   useEffect(() => {
     if (!userProfile) {
