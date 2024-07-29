@@ -1,33 +1,34 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {LoginType} from "../../types/types";
 import {login} from "../../store/actions/authActions";
 import {useAppDispatch, useAppSelector} from "../../store/hooks";
 import {useNavigate} from 'react-router-dom';
-import {selectAuthToken, selectLoginError, selectUserLoading} from "../../store/selectors/authSelectors";
+import {selectLoginError, selectUserLoading} from "../../store/selectors/authSelectors";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faUserCircle} from '@fortawesome/free-solid-svg-icons';
 import styles from './Login.module.scss';
+import {unwrapResult} from '@reduxjs/toolkit';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const dispatch = useAppDispatch();
-  const token = useAppSelector(selectAuthToken);
   const loading = useAppSelector(selectUserLoading);
   const loginError = useAppSelector(selectLoginError);
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleSignIn = async (event: React.FormEvent) => {
     event.preventDefault();
     const loginData: LoginType = { email, password };
-    dispatch(login(loginData));
-  };
-
-  useEffect(() => {
-    if (token) {
+    try {
+      const resultAction = await dispatch(login(loginData));
+      unwrapResult(resultAction);
       navigate('/profile');
+    } catch (err) {
+      console.log('Error')
     }
-  }, [token, navigate]);
+  };
 
   return (
     <div className={styles.signInPage}>

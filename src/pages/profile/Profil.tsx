@@ -5,6 +5,7 @@ import {fetchUserProfile} from "../../store/actions/authActions";
 import {selectAuthToken, selectUserError, selectUserProfile} from "../../store/selectors/authSelectors";
 import styles from "./User.module.scss";
 import EditButton from "../../components/uix/profil/EditButton";
+import Transactions from "../../components/uix/transactions/Transactions";
 
 const Profil: React.FC = () => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const Profil: React.FC = () => {
     {userProfile && <div className={styles.userPage}>
       <h1>Welcome back <br/> {userProfile?.firstName} {userProfile?.lastName}!</h1>
       <EditButton />
+      <Transactions />
     </div>}
   </>
 };
